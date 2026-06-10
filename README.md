@@ -55,11 +55,12 @@ This is the run discipline that makes it safe to leave running:
 
 ## Proof
 
-First run: the CaskeyCoding workspace — 18 dependency-ordered items across 5
-repos (a Python agent platform + a 3-repo encrypted-journal product), **18 PRs
-opened, verified, and merged** across ~18 self-paced iterations, stopping
-cleanly at the items that needed the human (specs that lived only on another
-machine, four human-gated decisions). That backlog seeded `SCHEMA.md` v1.0.0.
+First run: the CaskeyCoding workspace — 17 dependency-ordered items across 5
+repos (a Python agent-orchestration platform and a multi-repo web product),
+**19 PRs opened, verified, and merged** across self-paced iterations, stopping
+cleanly at the work that needed a human: one item it refused to spec (a
+dependency that lived only on another machine) and four human-gated decisions.
+That backlog seeded `SCHEMA.md` v1.0.0.
 
 ## Layout
 
