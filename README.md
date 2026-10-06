@@ -3,7 +3,7 @@
 Turn a repo into autonomous, dependency-ordered work an agent loop can drive
 end-to-end. You write (or generate) a `BACKLOG.md`; an agent loop picks the next
 unblocked item, does it, verifies, opens a PR, merges if authorized, updates
-status, and repeats — until everything left needs a human.
+status, and repeats, until everything left needs a human.
 
 It's two small things: a **versioned `BACKLOG.md` schema + loop protocol**
 ([`SCHEMA.md`](SCHEMA.md)), and a **`backlog` skill** ([`SKILL.md`](SKILL.md))
@@ -19,8 +19,22 @@ The loop is reliable because of two design choices, both in `SCHEMA.md`:
    iteration.
 2. **The project profile is discovered once.** Test command, default branch,
    pre-existing failures to ignore, merge authorization, repo-specific hard
-   rules — baked into the file so the loop doesn't rediscover them 18 times.
+   rules, all baked into the file so the loop doesn't rediscover them 18 times.
    This block is the difference between a loop that works and one that flails.
+3. **The file is checked against the repository before every pick.** An item
+   whose work already merged is closed, not worked again. The loop does
+   exactly what the file says, so the file has to be true (schema 1.1.0).
+
+## Start small
+
+If you have never run a queue, start with the five-item version in
+[Lesson 6 of the team-of-one series](https://caskeycoding.com/blog/lesson-6-the-backlog-queue):
+one file, a pick rule, an acceptance line per item, a `tier` per item, and one
+investigate item for the work you cannot write an acceptance line for yet. It
+uses the same field names as `SCHEMA.md`, so nothing is renamed when you grow
+into this repo. What this repo adds is the project profile block, the
+`backlog` skill that surveys a codebase and writes a fitted file, and the
+status lifecycle a loop can drive unattended.
 
 ## Quickstart
 
@@ -28,7 +42,7 @@ The loop is reliable because of two design choices, both in `SCHEMA.md`:
 # 1. Generate a fitted backlog (the "init")
 /backlog            # surveys the repo(s), discovers the profile, writes BACKLOG.md
 
-# 2. Drive it — self-paced
+# 2. Drive it, self-paced
 /loop Work the next eligible item per the loop protocol in BACKLOG.md
 
 #    …or on a fixed cadence
@@ -49,13 +63,13 @@ This is the run discipline that makes it safe to leave running:
 - **Verify before merge; ignore only known failures.** The profile lists
   pre-existing failures; anything else blocks the merge.
 - **Human-gate the irreversible.** Archiving, billable resources, outward-facing
-  publishing, business calls — the loop surfaces these and moves on, never acts.
+  publishing, business calls. The loop surfaces these and moves on, never acts.
 - **Newly-discovered work becomes new items**, not silent scope creep on the
   current one.
 
 ## Proof
 
-First run: the CaskeyCoding workspace — 17 dependency-ordered items across 5
+First run: the CaskeyCoding workspace, 17 dependency-ordered items across 5
 repos (a Python agent-orchestration platform and a multi-repo web product),
 **19 PRs opened, verified, and merged** across self-paced iterations, stopping
 cleanly at the work that needed a human: one item it refused to spec (a
@@ -67,7 +81,7 @@ That backlog seeded `SCHEMA.md` v1.0.0.
 ```
 loop-harness/
   SCHEMA.md                  # the versioned contract (item fields + protocol + project profile)
-  SKILL.md                   # the `backlog` skill — survey → generate BACKLOG.md
+  SKILL.md                   # the `backlog` skill: survey, then generate BACKLOG.md
   templates/BACKLOG.template.md
   CHANGELOG.md               # schema semver history
 ```
