@@ -11,7 +11,7 @@ that generates a fitted backlog by surveying your codebase.
 
 ## Why it works
 
-The loop is reliable because of two design choices, both in `SCHEMA.md`:
+The loop is reliable because of three design choices, all in `SCHEMA.md`:
 
 1. **The protocol travels in the file.** `BACKLOG.md`'s header *is* the run
    rules, so the driving prompt is just *"work the next eligible item per the
@@ -31,10 +31,13 @@ If you have never run a queue, start with the five-item version in
 [Lesson 6 of the team-of-one series](https://caskeycoding.com/blog/lesson-6-the-backlog-queue):
 one file, a pick rule, an acceptance line per item, a `tier` per item, and one
 investigate item for the work you cannot write an acceptance line for yet. It
-uses the same field names as `SCHEMA.md`, so nothing is renamed when you grow
-into this repo. What this repo adds is the project profile block, the
-`backlog` skill that surveys a codebase and writes a fitted file, and the
-status lifecycle a loop can drive unattended.
+is a teaching subset of `SCHEMA.md`. To adopt the full schema, map `doing` to
+`in_progress` and `review` to `in_review`, add the required `size` to each item,
+and use `### B-NNN` item headings. Copy the loop protocol and add the project
+profile block, or use the `backlog` skill to survey a codebase and write a
+fitted file. In this versioned queue, an investigation's backlog changes go
+through a PR; merging it closes the parent, while its children remain `draft`
+until a human promotes them.
 
 ## Quickstart
 
@@ -49,8 +52,10 @@ status lifecycle a loop can drive unattended.
 /loop 30m Work the next eligible item per the loop protocol in BACKLOG.md
 ```
 
-The loop stops on its own when every remaining item is `done`, `in_review`,
-`blocked`, or `human_gate`, and tells you what's left for you.
+After reconciling merged PRs, the loop stops when no eligible item remains:
+no `ready` item has all dependencies `done` and `human_gate` other than `true`.
+This includes queues waiting on `draft` items or unmet dependencies. It tells
+you what's left for you.
 
 ## The agent-orchestration pattern
 

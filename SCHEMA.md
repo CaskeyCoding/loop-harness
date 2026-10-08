@@ -53,8 +53,8 @@ Each item is a markdown `###` heading `B-NNN <title>` followed by a field list:
 **Status lifecycle:** `ready → in_progress → in_review → done`. `blocked` and
 `draft` are holding states the loop skips. An item discovered to be already done
 or wrong is set `done` with a `notes:` explanation rather than worked. `done`
-means merged, never "the agent said so"; only the iteration holding an item
-moves its status.
+means merged, never "the agent said so". The loop changes status only on the
+item it holds, except for confirmed-merge reconciliation in the protocol.
 
 ### Investigate items
 
@@ -69,7 +69,9 @@ Work you cannot write an acceptance line for yet still gets an item. Give it
 ```
 
 The loop works it like any other item: the output is new items appended at the
-bottom with `status: draft`, no code. A human reads the children, strikes or
+bottom with `status: draft`, no code. Commit these changes to the versioned
+backlog and open a PR under the usual merge policy; the parent is `done` when
+that PR merges. The children stay `draft` until a human reads them, strikes or
 edits, and marks the survivors `ready`. This is how a queue decomposes itself
 without a human writing every item by hand.
 
@@ -82,7 +84,8 @@ without a human writing every item by hand.
 
 Each iteration:
 
-1. Re-read this file. Pick the **lowest-numbered item with `status: ready` whose `depends_on` are all `done`**.
+1. Re-read this file and reconcile merged PRs as in step 4. Pick the **lowest-numbered item with `status: ready` whose `depends_on` are all `done` and whose `human_gate` is not `true`**.
+   If none qualifies, stop as in step 6.
    Before starting it, if its `pr` is empty, search the default branch history for its id
    (`git log origin/<default> --oneline --grep=B-NNN`). If the work already merged, set the item
    `done` with a note and pick again. The file is the program; a stale file makes the loop
@@ -91,15 +94,16 @@ Each iteration:
 3. Open a PR referencing `B-NNN`. If the project profile authorizes merging and the change is test-green and matches the item's acceptance: merge it, delete the branch, pull the default branch, set `status: done`. Otherwise leave it `in_review` with the PR URL for a human.
 4. On a later iteration, if an `in_review` item's PR has been merged, set it `done` (and pull the default branch in that repo).
 5. **Never** start an item with `human_gate: true`; surface it to the human and pick the next eligible item instead.
-6. Stop when every remaining item is `done`, `in_review`, `blocked`, or `human_gate`. Report the standstill (and, if running unattended, send one summary notification).
+6. Stop when no eligible item remains after reconciliation: no `ready` item has all dependencies `done` and `human_gate` other than `true`. This includes queues waiting on `draft` items or unmet dependencies. Report the standstill and what needs human action (and, if running unattended, send one summary notification).
 
 **Rules:**
 - One item per iteration; never batch.
-- Don't edit items you aren't working.
+- Don't edit items you aren't working, except status and notes updates for confirmed merged work in steps 1 and 4.
 - Respect each repo's `CLAUDE.md` and any hard rules named in the project profile.
 - Verify before merging: run the project's checks yourself; a known pre-existing failure listed in the profile is ignorable, anything else is not.
 - If an item turns out to be wrong or already done, mark it `done` with a note rather than doing makework.
 - When a finished item reveals new work, append it as a new `B-NNN` (don't silently expand the current item's scope).
+- Investigate items append children with `status: draft`; commit them to the versioned backlog and open a PR under the project merge policy. Merging closes the parent; only a human promotes its children to `ready`.
 
 ---
 
