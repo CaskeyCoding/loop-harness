@@ -3,6 +3,11 @@
 Schema versions follow semver. Generated `BACKLOG.md` files pin the version they
 were written against, so loops know which rules apply.
 
+## 1.2.0, 2026-10-10
+
+- New `drain` skill (`drain/SKILL.md`): one iteration of the loop as a skill. Reads the file, runs the freshness check, picks by the protocol, works the item in its own repo, verifies, sets `in_review` (or `review`), and stops with a four-part closing message. Investigate items append draft children instead of code. Blocks with one question and two answers rather than guessing. Proven on a four-repo scratch project: a build item drained and set to review; a run with nothing eligible said so and stopped; the next item drained after the human merged the first.
+- README Quickstart gains the watched one-item step (`/drain`) before the self-paced loop (`/loop /drain`).
+
 ## 1.1.1, 2026-10-10
 
 Additive. Lines up the schema with the Lesson 6 template so a reader can grow from the five-item file into this repo without renaming anything.
