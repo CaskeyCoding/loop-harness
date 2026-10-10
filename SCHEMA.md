@@ -1,6 +1,6 @@
 # BACKLOG schema & loop protocol
 
-**Schema version: 1.1.0** (additive over 1.0.0; a 1.0.0 file is still valid)
+**Schema version: 1.1.1** (additive over 1.0.0; a 1.0.0 file is still valid)
 
 This is the contract a `BACKLOG.md` file follows so an agent loop (e.g. Claude
 Code's `/loop`) can drive it autonomously: pick the next unblocked item, do it,
@@ -32,6 +32,7 @@ Each item is a markdown `###` heading `B-NNN <title>` followed by a field list:
 - depends_on: []
 - size: M
 - tier: build              # optional; judge | build | mechanical, default build
+- spec: specs/api/002-health.md   # optional; the spec this item serves
 - human_gate: false        # optional; omit when false
 - acceptance: <one or more concrete, checkable criteria>
 - pr: <url>                # added when opened
@@ -41,7 +42,8 @@ Each item is a markdown `###` heading `B-NNN <title>` followed by a field list:
 | Field | Required | Values / meaning |
 |---|---|---|
 | `repo` | yes | Which repo (or comma-list) the work lands in. |
-| `status` | yes | `ready` \| `in_progress` \| `in_review` \| `done` \| `blocked` \| `draft` |
+| `status` | yes | `ready` \| `in_progress` \| `in_review` \| `done` \| `blocked` \| `draft`. The short names `doing` and `review` (as in Lesson 6's template) are accepted aliases of `in_progress` and `in_review`. |
+| `spec` | no | Path to the spec the item serves, when one exists (`specs/api/002-health.md`). The loop reads it before starting and grades the result against its acceptance criteria. |
 | `depends_on` | yes | List of `B-NNN` ids that must be `done` first. `[]` = none. |
 | `size` | yes | `XS` \| `S` \| `M` \| `L`. Rough effort, used only for ordering intuition. |
 | `tier` | no | `judge` \| `build` \| `mechanical`. Which model the item deserves: `judge` when the acceptance itself needs a decision (an investigate item), `build` for a checkable acceptance line, `mechanical` when the steps are already enumerated in the item. Default `build`. The expensive model judges; the cheap one types. |
@@ -50,7 +52,7 @@ Each item is a markdown `###` heading `B-NNN <title>` followed by a field list:
 | `pr` | no | PR URL, added when the item enters `in_review`/`done`. |
 | `notes` | no | Provenance ("discovered during B-003"), provisional choices, caveats for the human. |
 
-**Status lifecycle:** `ready → in_progress → in_review → done`. `blocked` and
+**Status lifecycle:** `ready → in_progress → in_review → done` (or `ready → doing → review → done` with the short names). `blocked` and
 `draft` are holding states the loop skips. An item discovered to be already done
 or wrong is set `done` with a `notes:` explanation rather than worked. `done`
 means merged, never "the agent said so". The loop changes status only on the

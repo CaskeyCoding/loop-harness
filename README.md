@@ -5,9 +5,11 @@ end-to-end. You write (or generate) a `BACKLOG.md`; an agent loop picks the next
 unblocked item, does it, verifies, opens a PR, merges if authorized, updates
 status, and repeats, until everything left needs a human.
 
-It's two small things: a **versioned `BACKLOG.md` schema + loop protocol**
-([`SCHEMA.md`](SCHEMA.md)), and a **`backlog` skill** ([`SKILL.md`](SKILL.md))
-that generates a fitted backlog by surveying your codebase.
+It's three small things: a **versioned `BACKLOG.md` schema + loop protocol**
+([`SCHEMA.md`](SCHEMA.md)), a **`backlog` skill** ([`SKILL.md`](SKILL.md))
+that generates a fitted backlog by surveying your codebase, and a **`drain`
+skill** ([`drain/SKILL.md`](drain/SKILL.md)) that works exactly one item and
+stops, with a four-part closing message you can grade against the item.
 
 ## Why it works
 
@@ -23,7 +25,7 @@ The loop is reliable because of three design choices, all in `SCHEMA.md`:
    This block is the difference between a loop that works and one that flails.
 3. **The file is checked against the repository before every pick.** An item
    whose work already merged is closed, not worked again. The loop does
-   exactly what the file says, so the file has to be true (schema 1.1.0).
+   exactly what the file says, so the file has to be true (schema 1.1.x).
 
 ## Start small
 
@@ -45,12 +47,19 @@ until a human promotes them.
 # 1. Generate a fitted backlog (the "init")
 /backlog            # surveys the repo(s), discovers the profile, writes BACKLOG.md
 
-# 2. Drive it, self-paced
-/loop Work the next eligible item per the loop protocol in BACKLOG.md
+# 2. Work one item while you watch
+/drain              # freshness check, pick, do, set status, stop; four-part closing message
 
-#    …or on a fixed cadence
-/loop 30m Work the next eligible item per the loop protocol in BACKLOG.md
+# 3. Drive it, self-paced, once you trust the gates
+/loop /drain
+
+#    ...or on a fixed cadence
+/loop 30m /drain
 ```
+
+Step 2 is the Lesson 6 exercise: one item, watched, closed without a
+mid-flight question. Step 3 is the same skill on a timer; do not run it
+unattended before the gates in Lesson 7 are in place.
 
 After reconciling merged PRs, the loop stops when no eligible item remains:
 no `ready` item has all dependencies `done` and `human_gate` other than `true`.
@@ -87,13 +96,17 @@ That backlog seeded `SCHEMA.md` v1.0.0.
 loop-harness/
   SCHEMA.md                  # the versioned contract (item fields + protocol + project profile)
   SKILL.md                   # the `backlog` skill: survey, then generate BACKLOG.md
+  drain/SKILL.md             # the `drain` skill: work one item, set its status, stop
   templates/BACKLOG.template.md
   CHANGELOG.md               # schema semver history
 ```
 
-## Install the skill
+## Install the skills
 
 Copy or symlink `SKILL.md` into a skills dir Claude Code reads (e.g.
 `~/.claude/skills/backlog/SKILL.md` for user-level, or
 `.claude/skills/backlog/SKILL.md` in a project), keeping `SCHEMA.md` alongside
-it. Then `/backlog` is available in that scope.
+it. Copy `drain/SKILL.md` to `.claude/skills/drain/SKILL.md` the same way.
+Then `/backlog` and `/drain` are available in that scope. In a Git Bash
+shell on Windows, run `/drain` through `claude -p` with `MSYS_NO_PATHCONV=1`
+set, or the shell rewrites the slash command as a path.
