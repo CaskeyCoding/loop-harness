@@ -37,7 +37,8 @@ and use `### B-NNN` item headings. Copy the loop protocol and add the project
 profile block, or use the `backlog` skill to survey a codebase and write a
 fitted file. In this versioned queue, an investigation's backlog changes go
 through a PR; merging it closes the parent, while its children remain `draft`
-until a human promotes them.
+until a human promotes them. The platform this loop helps build is public at
+[caskeycoding.com/lab](https://caskeycoding.com/lab).
 
 ## Quickstart
 
