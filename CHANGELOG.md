@@ -3,6 +3,14 @@
 Schema versions follow semver. Generated `BACKLOG.md` files pin the version they
 were written against, so loops know which rules apply.
 
+## 1.1.1, 2026-10-10
+
+Additive. Lines up the schema with the Lesson 6 template so a reader can grow from the five-item file into this repo without renaming anything.
+
+- `doing` and `review` accepted as aliases of `in_progress` and `in_review`.
+- Optional `spec` field: the path of the spec an item serves.
+- Repo homepage now points at Lesson 6.
+
 ## 1.1.0, 2026-10-06
 
 Additive; every 1.0.0 file is still valid.

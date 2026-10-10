@@ -23,7 +23,7 @@ The loop is reliable because of three design choices, all in `SCHEMA.md`:
    This block is the difference between a loop that works and one that flails.
 3. **The file is checked against the repository before every pick.** An item
    whose work already merged is closed, not worked again. The loop does
-   exactly what the file says, so the file has to be true (schema 1.1.0).
+   exactly what the file says, so the file has to be true (schema 1.1.x).
 
 ## Start small
 
